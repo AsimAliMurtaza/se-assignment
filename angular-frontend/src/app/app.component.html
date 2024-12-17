@@ -1,0 +1,16 @@
+<div class="container">
+  <h1>Items List</h1>
+  
+  <!-- Add Item Form -->
+  <div>
+    <input [(ngModel)]="newItemName" placeholder="Enter item name" />
+    <button (click)="addItem()" >Add Item</button>
+  </div>
+  
+  <!-- Display Items -->
+  <ul>
+    <li *ngFor="let item of items">
+      {{ item.name }}
+    </li>
+  </ul>
+</div>
