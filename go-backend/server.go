@@ -4,6 +4,8 @@ import (
 	"log"
 	"net/http"
 
+	"os"
+
 	"github.com/gin-gonic/gin"
 	"github.com/graphql-go/graphql"
 	"github.com/neo4j/neo4j-go-driver/v5/neo4j"
@@ -11,10 +13,9 @@ import (
 
 var db neo4j.Driver
 
-// Neo4j connection
 func initNeo4j() (neo4j.Driver, error) {
-	uri := "neo4j+s://412123d7.databases.neo4j.io"
-	password := "Vn5sHBb5y8BOUTLdOHpZjhe3O4KsRBQJoWY_ZZTnIgA"
+	uri := os.Getenv("NEO4J_URI")
+	password := os.Getenv("NEO4J_PASSWORD")
 	auth := neo4j.BasicAuth("neo4j", password, "")
 	driver, err := neo4j.NewDriver(uri, auth)
 	if err != nil {
@@ -23,7 +24,6 @@ func initNeo4j() (neo4j.Driver, error) {
 	return driver, nil
 }
 
-// Define Item GraphQL object
 var itemType = graphql.NewObject(graphql.ObjectConfig{
 	Name: "Item",
 	Fields: graphql.Fields{
@@ -32,7 +32,6 @@ var itemType = graphql.NewObject(graphql.ObjectConfig{
 	},
 })
 
-// Define Query type for GraphQL
 var queryType = graphql.NewObject(graphql.ObjectConfig{
 	Name: "Query",
 	Fields: graphql.Fields{
@@ -63,7 +62,6 @@ var queryType = graphql.NewObject(graphql.ObjectConfig{
 	},
 })
 
-// Define Mutation type for GraphQL (to create new items)
 var mutationType = graphql.NewObject(graphql.ObjectConfig{
 	Name: "Mutation",
 	Fields: graphql.Fields{
@@ -79,7 +77,6 @@ var mutationType = graphql.NewObject(graphql.ObjectConfig{
 				session := db.NewSession(neo4j.SessionConfig{AccessMode: neo4j.AccessModeWrite})
 				defer session.Close()
 
-				// Create a new item in Neo4j
 				result, err := session.Run(
 					"CREATE (i:Item {name: $name}) RETURN i",
 					map[string]interface{}{"name": name},
@@ -103,7 +100,6 @@ var mutationType = graphql.NewObject(graphql.ObjectConfig{
 	},
 })
 
-// Create GraphQL schema
 var schema, _ = graphql.NewSchema(graphql.SchemaConfig{
 	Query:    queryType,
 	Mutation: mutationType,
@@ -118,7 +114,6 @@ func main() {
 
 	r := gin.Default()
 
-	// GraphQL handler
 	r.POST("/graphql", func(c *gin.Context) {
 		var params struct {
 			Query string `json:"query"`
@@ -142,6 +137,5 @@ func main() {
 		c.JSON(http.StatusOK, result)
 	})
 
-	// Start the server
 	r.Run(":8000")
 }

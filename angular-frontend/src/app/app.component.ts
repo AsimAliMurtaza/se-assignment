@@ -3,13 +3,13 @@ import { Apollo } from 'apollo-angular';
 import gql from 'graphql-tag';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { HttpClientModule } from '@angular/common/http'; // Import HttpClientModule
-import { GraphQLModule } from './graphql.module'; // Import GraphQLModule
+import { HttpClientModule } from '@angular/common/http'; 
+import { GraphQLModule } from './graphql.module'; 
 
 @Component({
   selector: 'app-root',
   standalone: true,
-  imports: [CommonModule, FormsModule, GraphQLModule, HttpClientModule], // Add HttpClientModule here
+  imports: [CommonModule, FormsModule, GraphQLModule, HttpClientModule], 
   templateUrl: './app.component.html',
   styleUrls: ['./app.component.css'],
 })
@@ -20,7 +20,6 @@ export class AppComponent {
 
   constructor(private apollo: Apollo) {}
 
-  // GraphQL query to get all items
   getItems() {
     this.apollo
       .watchQuery({
@@ -43,7 +42,6 @@ export class AppComponent {
       });
   }
 
-  // GraphQL mutation to add an item
   addItem() {
     if (this.newItemName.trim()) {
       this.apollo
@@ -62,8 +60,8 @@ export class AppComponent {
         })
         .subscribe({
           next: (result: any) => {
-            this.items.push(result.data.addItem); // Add item to list
-            this.newItemName = ''; // Reset input
+            this.items.push(result.data.addItem); 
+            this.newItemName = ''; 
           },
           error: (err) => {
             console.error('Error adding item:', err);
@@ -73,6 +71,6 @@ export class AppComponent {
   }
 
   ngOnInit() {
-    this.getItems(); // Fetch items when component initializes
+    this.getItems();
   }
 }
